@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# Conda
+*.conda
+*.env
+
+# Jupyter
+.ipynb_checkpoints
+
+# VSCode
+.vscode/
+
+# Data
+*.csv
+*.xlsx
+*.gsheet
+*.gdoc
+*.table
+
+# Docs
+site/
