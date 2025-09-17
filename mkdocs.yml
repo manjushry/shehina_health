@@ -1,0 +1,26 @@
+site_name: Shekina Framework Wiki
+nav:
+  - Inicio: index.md
+  - Wishlist: wishlist.md
+  - Configuración del ambiente: configuracion_ambiente.md
+  - Arquitectura: arquitectura.md
+  - Módulos: modulos.md
+  - BereshitSQL: bereshit.md
+  - Diagramas: diagramas.md
+  - Jerarquía de clases: jerarquia_clases.md
+  - Flujo de ramas: flujo_ramas.md
+  - Épicas: epicas.md
+  - Prompts: prompts/index.md
+  - Automatización: automatizacion/index.md
+  - Sprints: sprints/index.md
+  - Test Mermaid: test_mermaid.md
+plugins:
+  - search
+theme:
+  name: material
+  language: es
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc
+  - pymdownx.superfences

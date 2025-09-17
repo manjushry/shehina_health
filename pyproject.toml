@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shekina"
+version = "1.0.0"
+description = "Framework modular para ETL, grafos y orquestación en Python, con integración KNIME y soporte multi-backend."
+authors = [
+    { name = "Alef Development Team", email = "salud@soygenial.co" }
+]
+readme = "README.md"
+requires-python = ">=3.9"

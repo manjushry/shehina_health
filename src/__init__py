@@ -1,0 +1,11 @@
+# Expone la clase Mirror al nivel del paquete para simplificar las importaciones.
+
+from .alchemist import AlchemistPrime
+from .daath import DaathGraph
+from .mirror import Mirror
+
+__version__ = "1.0.0"
+
+print(f"INFO: Cargando el sub-paquete 'Alchemist' v{__version__}...")
+
+__all__ = ['Aleya', 'AlchemistPrime', 'DaathGraph', 'Shekina', 'Mirror']

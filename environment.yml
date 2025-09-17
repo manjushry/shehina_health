@@ -1,0 +1,54 @@
+# Shekina Framework - Entorno reproducible
+name: shekina
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pandas>=2.0.3
+  - polars
+  - dask
+  - sqlalchemy>=1.4
+  - psycopg2-binary
+  - mysql-connector-python
+  - pyodbc
+  - spacy
+  - regex
+  - thefuzz
+  - python-levenshtein
+  - rapidfuzz
+  - unidecode
+  - jellyfish
+  - lxml
+  - beautifulsoup4
+  - openpyxl
+  - xlrd
+  - python-dateutil
+  - holidays
+  - tzdata
+  - pytz
+  - orjson
+  - jsonschema
+  - deepdiff
+  - google-api-python-client
+  - google-auth-httplib2
+  - google-auth-oauthlib
+  - phonenumbers
+  - email_validator
+  - geopy
+  - networkx
+  - pyvis
+  - tabulate
+  - jupyterlab
+  - notebook
+  - ipykernel
+  - pip
+  - pip:
+    - mkdocs
+    - mkdocs-material
+    - mkdocs-mermaid-plugin
+  - mkdocs
+  - mkdocs-material
+  - mkdocs-mermaid-plugin
+  - pyap
+  - fhir.resources
