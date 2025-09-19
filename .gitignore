@@ -9,21 +9,12 @@ build/
 dist/
 .eggs/
 *.egg-info/
-
 # Node/Docusaurus
 node_modules/
 build/
 .cache/
 .docusaurus/
 .env
-
-# Ignorar todo docusaurus excepto docs y config
-docusaurus/*
-!docusaurus/docs/**
-!docusaurus/docusaurus.config.ts
-!docusaurus/sidebars.js
-!docusaurus/sidebars.ts
-!docusaurus/tsconfig.json
 
 # Python
 __pycache__/

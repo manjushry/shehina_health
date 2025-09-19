@@ -1,0 +1,43 @@
+[
+  {
+    "id": "s1",
+    "step": "load_base",
+    "depends_on": [],
+    "enabled": true,
+    "opcode": "mirror.select_df",
+    "payload": {"sql": "SELECT 1 AS id, 'A' AS raw UNION ALL SELECT 2, 'B'"},
+    "outputs": ["base_df"],
+    "retries": 0,
+    "timeout_s": 10
+  },
+  {
+    "id": "s2",
+    "step": "cleanup",
+    "depends_on": ["load_base"],
+    "enabled": true,
+    "opcode": "alchemist.transmute",
+    "payload": {
+      "engine": "polars",
+      "steps": [
+        {"type": "CLEAN_IDENTIFIER", "src": "raw", "target": "clean", "pattern": "[^A-Za-z0-9]", "replacement": ""}
+      ]
+    },
+    "inputs": ["base_df"],
+    "outputs": ["clean_df"],
+    "retries": 0,
+    "timeout_s": 10
+  },
+  {
+    "id": "s3",
+    "step": "skip_demo",
+    "depends_on": ["cleanup"],
+    "enabled": true,
+    "opcode": "mirror.upsert_df",
+    "condition": {"==": [1, 2]},
+    "payload": {"table": "demo.out", "keys": ["id"]},
+    "inputs": ["clean_df"],
+    "outputs": ["rows_written"],
+    "retries": 0,
+    "timeout_s": 10
+  }
+]

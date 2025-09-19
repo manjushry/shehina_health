@@ -41,7 +41,7 @@ const config = {
         src: 'img/logo.svg',
       },
       items: [
-        {to: '/docs/index', label: 'Inicio', position: 'left'},
+  {to: '/docs/intro', label: 'Inicio', position: 'left'},
         {to: '/docs/concepto/index', label: 'Concepto', position: 'left'},
         {to: '/docs/diseño/index', label: 'Diseño', position: 'left'},
         {to: '/docs/formacion/index', label: 'Formación', position: 'left'},

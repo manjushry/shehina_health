@@ -1,0 +1,22 @@
+{
+  "executor_aliases": {
+    "alkemist": "alchemist",
+    "AlchemistPrime": "alchemist",
+    "mirror": "mirror",
+    "daath": "daath"
+  },
+  "executors": {
+    "alchemist": {
+      "strategy": "internal_alchemist",
+      "description": "Usa AlchemistPrime para transmutar df_data con df_flow."
+    },
+    "mirror": {
+      "strategy": "run_rows",
+      "description": "Ejecuta filas del grupo usando el registry (mirror.*)."
+    },
+    "daath": {
+      "strategy": "internal_daath",
+      "description": "Valida sinónimos y genera plan de upsert para grafo de columnas/valores."
+    }
+  }
+}

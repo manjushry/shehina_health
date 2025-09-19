@@ -6,7 +6,8 @@ channels:
 dependencies:
   - python=3.9
   - pandas>=2.0.3
-  - polars
+  # Polars pin para estabilidad en conda (compatible con Python 3.9)
+  - polars>=1.0,<2.0  # Pinned to keep ABI stable on Windows; Notebook can pip install if missing
   - dask
   - sqlalchemy>=1.4
   - psycopg2-binary
@@ -47,8 +48,6 @@ dependencies:
     - mkdocs
     - mkdocs-material
     - mkdocs-mermaid-plugin
-  - mkdocs
-  - mkdocs-material
-  - mkdocs-mermaid-plugin
-  - pyap
-  - fhir.resources
+    - pyap
+    - fhir.resources
+    - pytest

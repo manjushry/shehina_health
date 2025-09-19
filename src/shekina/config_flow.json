@@ -1,0 +1,146 @@
+{
+    "context":{
+        "executor_aliases": {
+            "alkemist": "alchemist",
+            "AlchemistPrime": "alchemist"
+        },
+        "alias":[
+            "mirror_source AS df_src", 
+            "mirror_target AS df_tgt",
+            "mirror_flow AS df_flow",
+            "daath_health AS daath",
+            "shekina AS sk",
+            "periodo_inicial AS mes_ini",
+            "periodo_final AS mes_fin",
+            "process_key AS pk"
+        ],
+
+        "periodos_a_procesar":{
+                "inicio":"202501",
+                "fin":"202505"
+        },
+        "process_key_ppal" : "homo_encuentros",
+        "mirror_source": {
+            "type":"{db/file/folder}",
+            "cfg_database":{
+                "type":"postgres",
+                "host":"localhost",
+                "usr":"postgres",
+                "pwd":"xxxxxx"
+            },
+            "cfg_file":{
+                "type":"xlsx/csv/xls/gsheet/(xml normalizado para excel)/python_data",
+                "path_file":"/path/to/file",
+                "url":"http://example.com/file",
+                "sheet_name":"Sheet1"
+            },
+            "cfg_folder":{
+                "path_folder":"/path/to/folder",
+                "filter_file_extension":".csv",
+                "filter_file_name":"*",
+                "subfolder":true,   
+                "sheet_name":"Sheet1"
+            },
+            "cfg_knime":{
+                "input_index":"0"
+            }
+        },
+        "mirror_target":{
+            "type":"{db/file/knime}",
+            "cfg_database":{
+                "type":"postgres",
+                "host":"localhost",
+                "usr":"postgres",
+                "pwd":"xxxxxx"
+            },
+            "cfg_file":{
+                "type":"xlsx/csv/xls/gsheet/(xml normalizado para excel)/python_data",
+                "path_file":"/path/to/file",
+                "url":"http://example.com/file",
+                "sheet_name":"Sheet1"
+            },
+            "cfg_knime":{
+                "output_index":"0"
+            }
+        },
+        "daath_health":{
+            "nodes_upsert":["paciente", "edad", "sexo", "diagnostico", "periodo_atencion", "fin_atencion", "causa_atencion", "sexo", "edad", "cod_servicio", "cie10", "cod_sede_reps", "municipio_atencion", "departamento_atencion", "municipio_afiliacion", "departamento_afiliacion", "tipo_afiliado", "parentesco", "discapacidad", "grado_discapacidad", "contact_point"],
+            "category_nodes_required":["cups","cie","sexo","edad","grupo_etario"],
+            "relations_required":[
+                    "cups--|ES_VALIDO_CON|->[sexo,edad,cie,convenio,fecha_atencion]",
+                    "cie10--|PERTENECE_A|->grd_cie",
+                    "cie11--|ES_SINONIMO_DE|->cie10",
+                    "fin_atencion--|ES_VALIDO_CON|->[cups,sexo,edad,cie]",
+                    "causa_atencion--|ES_VALIDO_CON|->[cups,sexo,edad,cie,fin_atencion]",
+                    "cups--|PERTENECE_A|->[tipo_rips,capitulo_cups,grser_reps,nivel_complejidad,ambito_atencion,vez]",
+                    "cups--|PERTENECE_A|->[tipo_rips,capitulo_cups,grser_reps]",
+                    "consultorio--|PERTENECE_A|->[cod_reps_sede,municipio,departamento]",
+                    "medico--|ATIENDE_EN|->[consultorio]",
+                    "cod_reps_sede--|PERTENECE_A|->[municipio,departamento]",
+                    "edad--|PERTENECE_A|->grupo_etario",
+                    "paciente--|PERTENECE_A|->edad",
+                    "paciente--|PERTENECE_A|->sexo",
+                    "paciente--|PERTENECE_A|->tipo_afiliado",
+                    "paciente--|PERTENECE_A|->parentesco",
+                    "paciente--|PERTENECE_A|->discapacidad",
+                    "paciente--|PERTENECE_A|->grado_discapacidad",
+                    "paciente--|PERTENECE_A|->[municipio_afiliacion,departamento_afiliacion]"
+                ],
+            "col_relations_upsert":[
+                {
+                    "definition":"paciente--|SERVICIO_RECIBIDO|->cod_servicio",
+                    "properties":["capitulo_cups","tipo_rips","grser_reps","vez","fin_atencon","causa_atencion","ambito_atencion","nivel_complejidad","tipo_atencion","modalidad_servicio","cantidad","duracion_minutos"]
+                },
+                {
+                    "definition":"paciente--|ENFERMEDAD_OBSERVADA|->cie10",
+                    "properties":["grd_cie","grado_discapacidad","discapacidad","tipo_diag"]
+                },
+                {
+                    "definition":"encuentro--|ES_RIPS_VALIDO|->[paciente,cups,sexo,edad,cie10,convenio,fecha_atencion,estado_afiliacion]",
+                    "properties":["mes","año","status_rips","msg_error"]
+                },
+                {
+                    "definition":"fin_atencion--|ES_RIPS_VALIDO|->[grado_discapacidad,discapacidad,cups,sexo,edad,cie10,convenio,fecha_atencion]",
+                    "properties":["mes","año","status_rips","msg_error"]
+                },
+                {
+                    "definition":"causa_atencion--|ES_RIPS_VALIDO|->[grado_discapacidad,discapacidad,cups,sexo,edad,cie10,convenio,fecha_atencion]",
+                    "properties":["mes","año","status_rips","msg_error"]
+                },
+                {
+                    "definition":"contact_point--|PERTENECE_A|->paciente",
+                    "properties":["periodo_inicial","periodo_final","vigente","valido"]
+                },
+                {
+                    "definition":"address--|PERTENECE_A|->paciente",
+                    "properties":["periodo_inicial","periodo_final","vigente","valido"]
+                },
+                {
+                    "definition":"paciente--|PERTENECE_A|->edad",
+                    "properties":["grupo_etario"]
+                },
+                {
+                    "definition":"paciente--|PERTENECE_A|->sexo",
+                    "properties":["sexo"]
+                },
+                {
+                    "definition":"paciente--|PERTENECE_A|->tipo_afiliado",
+                    "properties":["tipo_afiliado"]
+                },
+                {
+                    "definition":"paciente--|PERTENECE_A|->parentesco",
+                    "properties":["parentesco"]
+                },
+                {
+                    "definition":"paciente--|PERTENECE_A|->discapacidad",
+                    "properties":["discapacidad","grado_discapacidad"]
+                },
+                {   
+                    "definition":"paciente--|PERTENECE_A|->[municipio_afiliacion,departamento_afiliacion]",
+                    "properties":["municipio_afiliacion","departamento_afiliacion"]
+                }
+            ]
+        }
+    }
+}
+    

@@ -1,0 +1,51 @@
+---
+title: Matriz de pruebas interactiva
+sidebar_position: 100
+---
+
+import DataTable from '@site/src/components/DataTable';
+import Link from '@docusaurus/Link';
+
+# Matriz de pruebas interactiva (Shekina)
+
+Puedes buscar/ordenar esta tabla, y cambiar de página si hay muchos casos.
+
+<DataTable
+  columns={[
+    { key: 'test_id', header: 'test_id', sortable: true },
+    { key: 'caso', header: 'Caso de uso', sortable: true },
+    { key: 'entradas', header: 'Entradas' },
+    { key: 'resultado', header: 'Resultado' },
+    { key: 'vscode', header: 'VS Code' },
+    { key: 'knime', header: 'KNIME' },
+  ]}
+  data={[
+    {
+      test_id: 'Shekina/UC1',
+      caso: 'Poblar grafo desde KNIME (config_df + data_dict)',
+      entradas: 'Tabla de config de procesos; DataFrame de datos por proceso',
+      resultado: 'Nodos/aristas creados según config',
+      vscode: <Link to="./uc1_vscode">UC1 (pytest)</Link>,
+      knime: <Link to="./uc1_knime">UC1 (KNIME)</Link>,
+    },
+    {
+      test_id: 'Shekina/UC2',
+      caso: 'Omitir procesos con execute = false',
+      entradas: 'config_df con execute=false',
+      resultado: 'No se crean nodos/aristas para ese proceso',
+      vscode: <Link to="./uc2_vscode">UC2 (pytest)</Link>,
+      knime: <Link to="./uc2_knime">UC2 (KNIME)</Link>,
+    },
+    {
+      test_id: 'Shekina/UC3',
+      caso: 'Manejar ausencia de datos por proceso',
+      entradas: 'config_df válido sin datos en data_dict',
+      resultado: 'Se registra warning y continúa',
+      vscode: <Link to="./uc3_vscode">UC3 (pytest)</Link>,
+      knime: <Link to="./uc3_knime">UC3 (KNIME)</Link>,
+    },
+  ]}
+  pageSize={5}
+/>
+
+> Tip: Esta tabla es reusable para otras clases (DaathGraph, Mirror, etc.) solo cambiando `data` y `columns`.

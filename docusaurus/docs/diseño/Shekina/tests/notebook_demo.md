@@ -1,0 +1,101 @@
+---
+title: Demo Jupyter — Orquestación con tabla canónica
+sidebar_position: 99
+---
+
+# Demo Jupyter — Orquestación con tabla canónica
+
+Este demo muestra cómo Shekina orquesta un proceso simple desde una “tabla canónica” (JSON), ejecutando por lotes (DAG), con un paso que se omite por condición. Todo corre en memoria con pandas y un fallback opcional si no hay Polars instalado.
+
+- Notebook: `notebooks/Shekina/proceso_demo.ipynb`
+- Proceso (JSON): `notebooks/Shekina/proceso_demo.json`
+
+Importante (Mermaid): si algún nodo incluye paréntesis, el título debe ir entre comillas dobles para evitar errores de parseo en los diagramas.
+
+## Secuencia del cuaderno (Jupyter)
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant VSCode as "VS Code (Jupyter)"
+    participant Kernel as "Kernel Python"
+    participant Registry
+    participant Mirror
+    participant Alchemist
+    participant Context
+    participant Log as "Run Log"
+
+    User->>VSCode: Abrir proceso_demo.ipynb
+    VSCode->>Kernel: Iniciar kernel y ejecutar celda 2 (setup)
+    Kernel->>Registry: Registrar opcodes (mirror.select_df, alchemist.transmute)
+    User->>VSCode: Ejecutar celda 3 (compilar DAG)
+    VSCode->>Kernel: Calcular niveles [["s1"],["s2"],["s3"]]
+    User->>VSCode: Ejecutar celda 4 (ejecución)
+    Kernel->>Registry: resolve("mirror.select_df")
+    Kernel->>Mirror: select_df(sql)
+    Mirror-->>Kernel: base_df (pandas)
+    Kernel->>Context: Guardar base_df
+    Kernel->>Registry: resolve("alchemist.transmute")
+    Kernel->>Alchemist: transmute(payload, inputs=["base_df"])
+    Alchemist-->>Kernel: clean_df (pandas|polars->pandas)
+    Kernel->>Context: Guardar clean_df
+    Kernel->>Registry: resolve("mirror.upsert_df")
+    Kernel->>Kernel: Evaluar condición (jsonlogic)
+    Kernel-->>Log: step s3 skipped
+    VSCode->>Kernel: Ejecutar celda 5 (inspección)
+    Kernel-->>User: Mostrar clean_df y run_log
+```
+
+## Flujo de proceso (s1 → s2 → s3 con condición)
+
+```mermaid
+flowchart LR
+  S1["s1: mirror.select_df"] --> S2["s2: alchemist.transmute"]
+  S2 --> C{"condition equals"}
+  C -- true --> S3["s3: mirror.upsert_df"]
+  C -- false --> SKIP["skipped"]
+```
+
+## Tabla de configuración (por paso)
+
+| id  | step       | opcode                | depends_on     | enabled | condition            | inputs          | outputs             | payload (resumen) |
+|-----|------------|-----------------------|----------------|---------|----------------------|-----------------|---------------------|-------------------|
+| s1  | load_base  | mirror.select_df      | `[]`           | true    | —                    | —               | `['base_df']`       | `sql: "SELECT 1 AS id, 'A' AS raw UNION ALL SELECT 2, 'B'"` (espera columnas `id:int`, `raw:str`) |
+| s2  | cleanup    | alchemist.transmute   | `['load_base']`| true    | —                    | `['base_df']`   | `['clean_df']`      | `engine: 'polars'` (con fallback a pandas). `steps: [{type: 'CLEAN_IDENTIFIER', src: 'raw', target: 'clean', pattern: '[^A-Za-z0-9]', replacement: ''}]` |
+| s3  | skip_demo  | mirror.upsert_df      | `['cleanup']`  | true    | `{"==": [1, 2]}`    | `['clean_df']`  | `['rows_written']`  | `table: 'demo.out'`, `keys: ['id']` (se omite por condición falsa en este demo) |
+
+Contrato de I/O esperado:
+
+- `base_df`: DataFrame con columnas `id:int`, `raw:str`.
+- `clean_df`: DataFrame con columnas `id:int`, `raw:str`, `clean:str` (resultado de `CLEAN_IDENTIFIER`).
+- `rows_written`: entero con filas afectadas por `upsert_df` (en el demo no se ejecuta por condición falsa).
+
+## Cómo ejecutarlo en VS Code
+
+## Prueba interactiva (en el navegador)
+
+Puedes experimentar con la tabla canónica sin salir del sitio. Edita el JSON y observa cómo cambian los niveles (DAG) y el diagrama Mermaid.
+
+import NotebookPlayground from '@site/src/components/NotebookPlayground';
+
+<NotebookPlayground />
+
+1) Abre `notebooks/Shekina/proceso_demo.ipynb`.
+2) Selecciona el kernel de Python de tu entorno (por ejemplo, “shekina (Python 3.9)”).
+3) Ejecuta las celdas en orden:
+   - Celda 1: descripción (markdown).
+   - Celda 2: setup (importa pandas; Polars es opcional y hay fallback a pandas).
+   - Celda 3: compila el DAG y muestra los niveles (esperado: `[["s1"],["s2"],["s3"]]`).
+   - Celda 4: ejecuta los pasos por lotes; `s1` y `s2` deben ser `ok`, `s3` se marca `skipped` por condición falsa.
+   - Celda 5: imprime `context` y un `run_log` en DataFrame.
+
+Resultados esperados:
+
+- context keys: `['base_df', 'clean_df']`
+- run_log con 3 filas: `load_base (ok)`, `cleanup (ok)`, `skip_demo (skipped)`.
+
+## Notas técnicas
+
+- `mirror.select_df` (demo) construye un DataFrame pequeño en memoria (simula lectura por SQL); en producción lo realiza Mirror con la conexión real.
+- `alchemist.transmute` aplica un CLEAN_IDENTIFIER; si Polars no está disponible, usa pandas con la misma semántica.
+- La condición se evalúa con una forma mínima de jsonlogic; si es falsa, el step se salta y se registra en el run_log.
