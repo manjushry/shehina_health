@@ -61,3 +61,25 @@ class BackendGSuite:
     def gdoc_batch_update(self, document_id: str, requests: List[Dict[str, Any]]) -> None:
         raise NotImplementedError
 
+    # Docs Tabs (modelo por secciones o named ranges)
+    def gdoc_list_tabs(self, document_id: str) -> List[str]:
+        """
+        Retorna la lista de 'tabs' lógicos en el documento. Implementación sugerida:
+        - Buscar encabezados H1/H2 y/o namedRanges que sigan convención TAB::<name>.
+        - Alternativamente, detectar marcadores especiales de inicio/fin (ver gsuite_format).
+        """
+        raise NotImplementedError
+
+    def gdoc_upsert_tab(self, document_id: str, tab_name: str, md_text: str) -> None:
+        """
+        Crea o actualiza el contenido de una 'tab' identificada por nombre.
+        Estrategia:
+        - Si existe named range para la tab, reemplazar su rango con requests MD→GDoc.
+        - Si no existe, crear sección (encabezado/markers) y escribir contenido.
+        """
+        raise NotImplementedError
+
+    def gdoc_extract_tab(self, document_id: str, tab_name: str) -> str:
+        """Extrae el contenido de una 'tab' como Markdown (aproximado)."""
+        raise NotImplementedError
+

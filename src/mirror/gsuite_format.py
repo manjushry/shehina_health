@@ -43,3 +43,28 @@ def md_to_gdoc_requests(md_text: str) -> List[Dict[str, Any]]:
         })
     return requests
 
+
+# --- Tabs helpers (Docs) ---
+
+def tab_start_marker(name: str) -> str:
+    return f":::TAB {name} START:::"
+
+
+def tab_end_marker(name: str) -> str:
+    return f":::TAB {name} END:::"
+
+
+def gdoc_build_tab_requests(tab_name: str, md_text: str) -> List[Dict[str, Any]]:
+    """
+    Construye requests para insertar/actualizar una 'tab' en GDoc.
+    Estrategia simple: insertar encabezado H1 + markers + cuerpo MD como párrafos.
+    """
+    reqs: List[Dict[str, Any]] = []
+    header = f"\n# {tab_name}\n\n"
+    reqs.append({"insertText": {"location": {"index": 1}, "text": header}})
+    reqs.append({"insertText": {"location": {"index": 1}, "text": tab_start_marker(tab_name) + "\n"}})
+    for line in md_text.splitlines():
+        reqs.append({"insertText": {"location": {"index": 1}, "text": line + "\n"}})
+    reqs.append({"insertText": {"location": {"index": 1}, "text": tab_end_marker(tab_name) + "\n"}})
+    return reqs
+

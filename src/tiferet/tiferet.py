@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
+from aleya.aleya import Aleya
+
 
 @dataclass
 class FlowStepLog:
@@ -12,7 +14,7 @@ class FlowStepLog:
     extra: Dict[str, Any] = field(default_factory=dict)
 
 
-class Tiferet:
+class Tiferet(Aleya):
     """
     Tiferet: Agente de automatización con IA para ejecutar flujos definidos en Sheets/JSON.
 
@@ -28,7 +30,8 @@ class Tiferet:
     """
 
     def __init__(self, context: Optional[Dict[str, Any]] = None) -> None:
-        self.context: Dict[str, Any] = context or {}
+        super().__init__()
+        self.set_context(context or {})
         self.logs: List[FlowStepLog] = []
 
     def load_flow(self, source: str, kind: str = "json", **kwargs) -> Dict[str, Any]:
@@ -53,18 +56,16 @@ class Tiferet:
 
     def run_flow(self, flow_def: Dict[str, Any], mode: str = "dry-run") -> Dict[str, Any]:
         """
-        Ejecuta el flujo usando Shekina.
+        Ejecuta/valida un flujo documental/definiciones.
         - mode=dry-run: no persiste, solo planifica/valida.
-        - mode=execute: ejecuta completo según estrategias del ejecutor.
+        - mode=execute: ejecuta acciones documentales (p. ej., crear hojas de remediación)
         """
         try:
             self.log_step("s0", "Ok", "Inicio ejecución del flujo")
 
-            # Integración mínima con Shekina (placeholder):
-            # from shekina.shekina import Shekina
-            # engine = Shekina(context=self.context)
-            # result = engine.invoke({...})
-            result = {"status": "dry-run" if mode == "dry-run" else "executed"}
+            # Aquí Tiferet no orquesta ETL (eso es Shekina). Tiferet opera sobre
+            # definiciones/documentación y puede disparar utilidades de Aleya/Mirror.
+            result = {"status": "dry-run" if mode == "dry-run" else "executed", "engine": "Tiferet"}
 
             self.log_step("s1", "Ok", f"Flujo ejecutado en modo: {mode}")
             return {"ok": True, "result": result, "logs": [l.__dict__ for l in self.logs]}

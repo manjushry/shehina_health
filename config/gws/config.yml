@@ -1,0 +1,12 @@
+# Configuración de Alef para integración con GSuite / Google Drive
+# Ruta absoluta en Windows hacia la carpeta de Google Drive que contiene 'documentos'
+gdrive_documents_path: 'G:\.shortcut-targets-by-id\1fENbpuTdON265HSA0icoN8nHYS4gWJHF\_rafEl\aktriel\01__min_transporte\01__calescopio'
+
+# Ruta local del enlace dentro del repo (junction/symlink)
+local_link_path: 'c:\ariel\documentos'
+
+# Tipo de enlace a crear en Windows: 'junction' (recomendado) o 'symlink'
+link_type: 'junction'
+
+# Asegurar que .gitignore incluya 'documentos/' en la raíz del repo
+ensure_gitignore: true

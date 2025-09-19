@@ -36,6 +36,8 @@ src/credentials.json
 *service-account*.json
 *.pem
 *.p12
+config/gws/*.json
+!config/gws/config.example.json
 
 # VS Code
 .vscode/
