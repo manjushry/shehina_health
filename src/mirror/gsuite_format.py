@@ -33,14 +33,27 @@ def gdoc_make_section(title: str) -> Dict[str, Any]:
 
 
 def md_to_gdoc_requests(md_text: str) -> List[Dict[str, Any]]:
-    """Esqueleto: convertir Markdown a requests de GDoc (simplificado)."""
-    # En siguientes épicas, usar un parser MD y mapear a requests (párrafos, headers, listas).
+    """Deprecated: prefiera md_to_gdoc_requests_with_tab con tabId nativo."""
+    return md_to_gdoc_requests_with_tab(md_text, tab_id=None)
+
+
+def md_to_gdoc_requests_with_tab(md_text: str, tab_id: str | None) -> List[Dict[str, Any]]:
+    """
+    Convertir Markdown simple a requests InsertText.
+    Si se provee tab_id, cada request apunta a esa tab (cuando aplica).
+    """
     lines = md_text.splitlines()
     requests: List[Dict[str, Any]] = []
     for line in lines:
-        requests.append({
-            "insertText": {"location": {"index": 1}, "text": line + "\n"}
-        })
+        req: Dict[str, Any] = {
+            "insertText": {
+                "location": {"index": 1},
+                "text": line + "\n",
+            }
+        }
+        if tab_id:
+            req["insertText"]["tabId"] = tab_id
+        requests.append(req)
     return requests
 
 
@@ -54,17 +67,18 @@ def tab_end_marker(name: str) -> str:
     return f":::TAB {name} END:::"
 
 
-def gdoc_build_tab_requests(tab_name: str, md_text: str) -> List[Dict[str, Any]]:
-    """
-    Construye requests para insertar/actualizar una 'tab' en GDoc.
-    Estrategia simple: insertar encabezado H1 + markers + cuerpo MD como párrafos.
-    """
+def gdoc_build_tab_requests(tab_name: str, md_text: str, tab_id: str | None) -> List[Dict[str, Any]]:
+    """Construye requests simples dirigidos a una tab específica si hay tab_id."""
     reqs: List[Dict[str, Any]] = []
     header = f"\n# {tab_name}\n\n"
-    reqs.append({"insertText": {"location": {"index": 1}, "text": header}})
-    reqs.append({"insertText": {"location": {"index": 1}, "text": tab_start_marker(tab_name) + "\n"}})
+    h_req: Dict[str, Any] = {"insertText": {"location": {"index": 1}, "text": header}}
+    if tab_id:
+        h_req["insertText"]["tabId"] = tab_id
+    reqs.append(h_req)
     for line in md_text.splitlines():
-        reqs.append({"insertText": {"location": {"index": 1}, "text": line + "\n"}})
-    reqs.append({"insertText": {"location": {"index": 1}, "text": tab_end_marker(tab_name) + "\n"}})
+        req: Dict[str, Any] = {"insertText": {"location": {"index": 1}, "text": line + "\n"}}
+        if tab_id:
+            req["insertText"]["tabId"] = tab_id
+        reqs.append(req)
     return reqs
 
