@@ -1,0 +1,23 @@
+{
+  "workspace_email": "your-workspace@domain.com",
+  "impersonate_user": null,
+  "project_id": "your-gcp-project-id",
+  "sheets": {
+    "definitions_spreadsheet_id": "<spreadsheet-id>",
+    "flow_sheets": [
+      "def_",
+      "context_prompt",
+      "flowelt_raw_loader",
+      "flowelt__daath_std_cols",
+      "flowelt__daath_std_vlrs",
+      "flowelt__upsert_daath_health",
+      "flowelt__create_ripsJson"
+    ]
+  },
+  "docs": {
+    "intelligence_doc_id": "<document-id>"
+  },
+  "drive": {
+    "definitions_folder_id": "<folder-id>"
+  }
+}

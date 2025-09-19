@@ -26,6 +26,16 @@ venv/
 *.egg-info/
 dist/
 *.log
+.secrets/
+config/google_workspace.json
+config/*.local.json
+*.credentials.json
+credential.json
+credentials.json
+src/credentials.json
+*service-account*.json
+*.pem
+*.p12
 
 # VS Code
 .vscode/
