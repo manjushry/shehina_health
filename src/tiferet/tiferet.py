@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import os
 from typing import Any, Dict, List, Optional
 
 from aleya.aleya import Aleya
@@ -94,4 +95,23 @@ class Tiferet(Aleya):
         }
         self.log_step("s_remediate", "Ok", f"Sugerida hoja {sheet_name}", kind=kind)
         return template
+
+    # --- Integración documental mínima ---
+    def sync_md_to_gdoc_tab(self, document_id: str, tab_name: str, md_path: str) -> Dict[str, Any]:
+        """Sincroniza un archivo MD a una Tab de GDoc (requiere BackendGSuite y front gdoc)."""
+        try:
+            from mirror.backend_gsuite import BackendGSuite
+            from alchemist import gdoc_front
+
+            with open(md_path, "r", encoding="utf-8") as f:
+                md_text = f.read()
+
+            cred = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "")
+            backend = BackendGSuite(credentials_path=cred)
+            gdoc_front.upsert_tab_from_md(backend, document_id, tab_name, md_text)
+            self.log_step("s_gdoc_sync", "Ok", f"Sync MD→GDoc tab '{tab_name}'")
+            return {"ok": True}
+        except Exception as ex:  # noqa: BLE001
+            self.log_step("s_gdoc_sync", "Error", str(ex))
+            return {"ok": False, "error": str(ex)}
 

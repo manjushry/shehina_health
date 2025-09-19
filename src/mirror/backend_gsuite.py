@@ -14,6 +14,9 @@ Nota: Este esqueleto evita dependencias fuertes inmediatas. Implementación comp
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+import json
+import os
+
 
 @dataclass
 class GSuiteConfig:
@@ -56,10 +59,28 @@ class BackendGSuite:
 
     # Docs
     def gdoc_read(self, document_id: str) -> Dict[str, Any]:
-        raise NotImplementedError
+        """
+        Implementación mínima de prueba: si existe un mock JSON en disco,
+        lo cargamos; de lo contrario, NotImplementedError. Sirve para tests offline.
+        Convención: config/google_workspace.json con {"documents": {"<id>": "path.json"}}
+        """
+        cfg_path = os.path.join(os.getcwd(), "config", "google_workspace.json")
+        if os.path.exists(cfg_path):
+            try:
+                with open(cfg_path, "r", encoding="utf-8") as f:
+                    cfg = json.load(f)
+                mapping = (cfg.get("documents") or {})
+                mock_path = mapping.get(document_id)
+                if mock_path and os.path.exists(mock_path):
+                    with open(mock_path, "r", encoding="utf-8") as f:
+                        return json.load(f)
+            except Exception:  # noqa: BLE001
+                pass
+        raise NotImplementedError("gdoc_read real pendiente de integrar Google API; use mock en config/google_workspace.json")
 
     def gdoc_batch_update(self, document_id: str, requests: List[Dict[str, Any]]) -> None:
-        raise NotImplementedError
+        # Stub para pruebas: no-op si se usa modo mock.
+        return None
 
     # Docs Tabs (modelo por secciones o named ranges)
     def gdoc_list_tabs(self, document_id: str) -> List[str]:
@@ -68,7 +89,17 @@ class BackendGSuite:
         - Buscar encabezados H1/H2 y/o namedRanges que sigan convención TAB::<name>.
         - Alternativamente, detectar marcadores especiales de inicio/fin (ver gsuite_format).
         """
-        raise NotImplementedError
+        doc = self.gdoc_read(document_id)
+        out: List[str] = []
+        def walk(ts: List[Dict[str, Any]]):
+            for t in ts:
+                props = (t.get("tabProperties") or {})
+                title = props.get("title")
+                if title:
+                    out.append(title)
+                walk(t.get("childTabs") or [])
+        walk(doc.get("tabs") or [])
+        return out
 
     def gdoc_upsert_tab(self, document_id: str, tab_name: str, md_text: str) -> None:
         """
@@ -77,7 +108,8 @@ class BackendGSuite:
         - Si existe named range para la tab, reemplazar su rango con requests MD→GDoc.
         - Si no existe, crear sección (encabezado/markers) y escribir contenido.
         """
-        raise NotImplementedError
+    # Este backend delegará en front para construir requests; aquí sólo sería IO real.
+    raise NotImplementedError("Use alchemist.gdoc_front.upsert_tab_from_md para construir requests; backend ejecuta batch_update real")
 
     def gdoc_extract_tab(self, document_id: str, tab_name: str) -> str:
         """Extrae el contenido de una 'tab' como Markdown (aproximado)."""
