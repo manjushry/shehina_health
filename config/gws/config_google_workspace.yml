@@ -1,4 +1,4 @@
-# Configuración de Alef para integración con GSuite / Google Drive
+# Configuración unificada para Google Workspace / Google Drive
 # Ruta absoluta en Windows hacia la carpeta de Google Drive que contiene 'documentos'
 gdrive_documents_path: 'G:\.shortcut-targets-by-id\1fENbpuTdON265HSA0icoN8nHYS4gWJHF\_rafEl\ishekina'
 

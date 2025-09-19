@@ -62,9 +62,9 @@ class BackendGSuite:
         """
         Implementación mínima de prueba: si existe un mock JSON en disco,
         lo cargamos; de lo contrario, NotImplementedError. Sirve para tests offline.
-        Convención: config/google_workspace.json con {"documents": {"<id>": "path.json"}}
+        Convención: config/gws/google_workspace.json con {"documents": {"<id>": "path.json"}}
         """
-        cfg_path = os.path.join(os.getcwd(), "config", "google_workspace.json")
+        cfg_path = os.path.join(os.getcwd(), "config", "gws", "google_workspace.json")
         if os.path.exists(cfg_path):
             try:
                 with open(cfg_path, "r", encoding="utf-8") as f:
